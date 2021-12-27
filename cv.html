@@ -1,0 +1,256 @@
+<html>
+
+#Average Mask Start
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2
+img = cv2.imread("grey.jpg",0)
+mask=3
+cv2.imshow("No filter",img)
+for i in range(3):
+   for j in range(3):
+       print(img[i][j], end=" ")
+val=[]
+print("-------------------------------")
+for i in range(img.shape[0]-mask):
+   for j in range(img.shape[1]-mask):
+       sum=0
+       for k in range(mask):
+           for l in range(mask):
+               if k==l:
+                   continue
+               else:
+                   sum=sum+img[i+k][j+l]
+       avg=sum/((mask*mask)-1)
+       img[i+1][j+1]=avg
+cv2.imshow("filter",img)
+cv2.waitKey(0)
+print(val)
+#Average Mask End
+
+<br><br><br><br>
+
+#Bit Plane Slicing Start
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+img = cv2.imread('grey.jpg',0)
+lst = []
+for i in range(img.shape[0]):
+    for j in range(img.shape[1]):
+         lst.append(np.binary_repr(img[i][j] ,width=8))
+eight_bit_img = (np.array([int(i[0]) for i in lst],dtype = np.uint8) * 128).reshape(img.shape[0],img.shape[1])
+seven_bit_img = (np.array([int(i[1]) for i in lst],dtype = np.uint8) * 64).reshape(img.shape[0],img.shape[1])
+six_bit_img = (np.array([int(i[2]) for i in lst],dtype = np.uint8) * 32).reshape(img.shape[0],img.shape[1])
+five_bit_img = (np.array([int(i[3]) for i in lst],dtype = np.uint8) * 16).reshape(img.shape[0],img.shape[1])
+four_bit_img = (np.array([int(i[4]) for i in lst],dtype = np.uint8) * 8).reshape(img.shape[0],img.shape[1])
+three_bit_img = (np.array([int(i[5]) for i in lst],dtype = np.uint8) * 4).reshape(img.shape[0],img.shape[1])
+two_bit_img = (np.array([int(i[6]) for i in lst],dtype = np.uint8) * 2).reshape(img.shape[0],img.shape[1])
+one_bit_img = (np.array([int(i[7]) for i in lst],dtype = np.uint8) * 1).reshape(img.shape[0],img.shape[1])
+finalr = cv2.hconcat([eight_bit_img,seven_bit_img,six_bit_img,five_bit_img])
+finalv =cv2.hconcat([four_bit_img,three_bit_img,two_bit_img,one_bit_img])
+final = cv2.vconcat([finalr,finalv])
+cv2.imshow('a',final)
+cv2.waitKey(0)
+#Bit Plane Slicing End
+<br><br><br><br>
+#contrast Stretching Start
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2
+img = cv2.imread("log_image.png",0)
+img2= cv2.imread("log_image.png")
+img=np.array(img)
+min=img.min()
+max=img.max()
+for i in range(img.shape[0]):
+     for j in range(img.shape[1]):
+         img[i][j]=((img[i][j]-min)*255)/(max-min)
+plt.imshow(img2)
+plt.show()
+plt.imshow(img,cmap="gray")
+plt.show()
+#contrast Stretching End
+
+<br><br><br><br>
+#corner Edge Detection
+from skimage.io import imread 
+from skimage.color import rgb2gray 
+from scipy.ndimage import gaussian_filter
+import matplotlib.pyplot as plt
+img = imread('abc.jpeg')
+imggray = rgb2gray(img)
+from scipy import signal as sig
+import numpy as np
+def gradient_x(imggray): 
+    kernel_x = np.array([[-1, 0, 1],[-2, 0, 2],[-1, 0, 1]])
+    return sig.convolve2d(imggray, kernel_x, mode='same')
+def gradient_y(imggray): 
+    kernel_y = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]]) 
+    return sig.convolve2d(imggray, kernel_y, mode='same') 
+I_x = gradient_x(imggray) 
+I_y = gradient_y(imggray)
+Ixx = gaussian_filter(I_x**2, sigma=1) 
+Ixy = gaussian_filter(I_y*I_x, sigma=1)
+Iyy = gaussian_filter(I_y**2, sigma=1)
+k = 0.05 
+detA = Ixx * Iyy - Ixy ** 2 
+k = 0.05
+detA = Ixx * Iyy - Ixy ** 2
+traceA = Ixx + Iyy
+harris_response = detA - k * traceA ** 2
+img_copy_for_corners = np.copy(img)
+img_copy_for_edges = np.copy(img)
+
+for rowindex, response in enumerate(harris_response):
+    for colindex, r in enumerate(response):
+        if r > 0:
+            img_copy_for_corners[rowindex, colindex] = [255,0,0]
+        elif r < 0:
+            img_copy_for_edges[rowindex, colindex] = [0,255,0]
+fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10,10))
+ax[0].set_title("corners found")
+ax[0].imshow(img_copy_for_corners)
+ax[1].set_title("edges found")
+ax[1].imshow(img_copy_for_edges)
+plt.show()
+#corner Edge Detection
+
+
+<br><br><br><br>
+#Example Python program for negative transformation of a Digital Image / gray level
+from PIL import Image
+from PIL import ImageFilter
+img = Image.open("abc.jpeg");
+img.show()
+for i in range(0, img.size[0]-1):
+    for j in range(0, img.size[1]-1):
+        pixelColorVals = img.getpixel((i,j));
+        redPixel    = 255 - pixelColorVals[0]; # Negate red pixel
+        greenPixel  = 255 - pixelColorVals[1]; # Negate green pixel
+        bluePixel   = 255 - pixelColorVals[2]; # Negate blue pixel
+        img.putpixel((i,j),(redPixel, greenPixel, bluePixel));
+img.show();
+#Negative Transformation Digital
+
+
+<br><br><br><br>
+#log transformation
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+image = cv2.imread('abc.jpeg')
+c = 255 / np.log(1 + np.max(image))
+log_image = c * (np.log(image + 1))
+log_image = np.array(log_image, dtype = np.uint8)
+plt.imshow(image)
+plt.show()
+plt.imshow(log_image)
+plt.show()
+#log transformation
+
+<br><br><br><br>
+#image negation
+from PIL import Image
+from PIL import ImageFilter
+import math
+img = Image.open("log_image.png");
+img.show()
+for i in range(0, img.size[0]-1):
+    for j in range(0, img.size[1]-1):
+        pixelColorVals = img.getpixel((i,j));
+        redPixel    = 255 - pixelColorVals[0];
+        greenPixel  = 255 - pixelColorVals[1];
+        bluePixel   = 255 - pixelColorVals[2];
+        img.putpixel((i,j),(redPixel, greenPixel, bluePixel));                   
+        img.putpixel((i,j),(redPixel, greenPixel, bluePixel));
+img.show();
+#image neagation END
+
+<br><br><br><br>
+#median Fillter and Smoothing Start
+import numpy as np
+import cv2
+import math
+img=cv2.imread("abc.jpeg",0)
+mask=5
+cv2.imshow("No filter",img)
+for i in range(img.shape[0]-mask):
+   for j in range(img.shape[1]-mask):
+       val = []
+       for k in range(mask):
+           for l in range(mask):
+               if k==l==(math.floor(mask/2)):
+                   continue
+               else:
+                   val.append(img[i+k][j+l])
+       img[i+(math.floor(mask/2))][j+(math.floor(mask/2))]=np.median(val)
+cv2.imshow("filter",img)
+cv2.waitKey(0)
+#Median Fillter and Smoothing End
+<br><br><br><br>
+
+#Synthetic Image Start
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2
+import math
+rows, cols = (100, 100)
+arr = [[0 for i in range(cols)] for j in range(rows)]
+arr=np.array(arr)
+for i in range(100):
+   n=0
+   for j in range(50):
+       arr[i][j]=n
+       n=n+10
+   for k in range(41,61):
+       arr[i][k]=255
+   arr[50][80]=255
+   arr[50][85]=150
+   arr[50][90]=20
+   arr[50][95]=240
+print(type(arr))
+print(arr)
+plt.imshow(arr,cmap="gray")
+plt.show()
+cv2.waitKey(0)
+#Synthetic Image End
+<br><br><br><br>
+#histogram
+import matplotlib.pyplot as plt
+import cv2
+img = cv2.imread('abc.jpeg',0)
+print(type(img))
+plt.hist(img,256)
+plt.show()
+#histogram
+
+<br><br><br><br>
+#laplacian filter
+import numpy as np
+from matplotlib import pyplot as plt
+import cv2
+img = cv2.imread("abc.jpeg",1)
+height,width,dim = img.shape
+print(img.shape)
+img_new = np.ones((height,width,3), np.uint8)
+mask = np.array([[-1,-1,-1],[-1,8,-1],[-1,-1,-1]])
+height = height - 1
+width = width - 1
+kernal_size = mask.shape[0]
+print(kernal_size)
+kernal_size_range = kernal_size // 2
+print(mask)
+for i in range(kernal_size_range,height):
+    for j in range(kernal_size_range,width):
+        ans = (img[i + 1][j] + img[i - 1][j] + img[i][j + 1]  + img[i][j - 1]) - (img[i][j] * 4.0)   
+        img_new[i][j] = ans
+fig = plt.figure()
+cv2.imwrite("result.png",img_new)
+ax1 = fig.add_subplot(121)
+ax1.imshow(img)
+ax2 = fig.add_subplot(122)
+ax2.imshow(img_new)
+plt.show()
+#lalpacin filter End
+</html>
