@@ -254,3 +254,189 @@ ax2.imshow(img_new)
 plt.show()
 #lalpacin filter End
 </html>
+
+
+<br><br><br><br>
+
+#Gradiant Opration Sharpning
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# original images 
+img = cv2.imread('/content/saltpepper.JPG')
+
+# Gauss filtering 
+gaussian = cv2.GaussianBlur(img,(3,3),0)
+
+# Threshold processing 
+ret, binary = cv2.threshold(gaussian, 127, 255, cv2.THRESH_BINARY)
+
+#Roberts operator 
+kernelx = np.array([[-1,0],[0,1]])
+kernely = np.array([[0,-1],[1,0]])
+x = cv2.filter2D(binary, cv2.CV_16S, kernelx)
+y = cv2.filter2D(binary, cv2.CV_16S, kernely)
+absX = cv2.convertScaleAbs(x)
+absY = cv2.convertScaleAbs(y)
+Roberts = cv2.addWeighted(absX, 0.5, absY, 0.5, 0)
+
+#Prewitt operator 
+kernelx = np.array([[1,1,1],[0,0,0],[-1,-1,-1]])
+kernely = np.array([[-1,0,1],[-1,0,1],[-1,0,1]])
+x = cv2.filter2D(binary, cv2.CV_16S, kernelx)
+y = cv2.filter2D(binary, cv2.CV_16S, kernely)
+absX = cv2.convertScaleAbs(x)
+absY = cv2.convertScaleAbs(y)
+Prewitt = cv2.addWeighted(absX,0.5,absY,0.5,0)
+
+#Sobel operator 
+x = cv2.Sobel(binary, cv2.CV_16S, 1, 0)
+y = cv2.Sobel(binary, cv2.CV_16S, 0, 1)
+absX = cv2.convertScaleAbs(x)
+absY = cv2.convertScaleAbs(y)
+Sobel = cv2.addWeighted(absX, 1, absY, 1, 1)
+
+
+titles = ['Source Image','Roberts Image','Prewitt Image','Sobel Image',]
+images = [img, Roberts, Prewitt, Sobel]
+for i in np.arange(4):
+    plt.subplot(2,2,i+1)
+    plt.imshow(images[i],'gray')
+    plt.title(titles[i])
+    plt.xticks([])
+    plt.yticks([])
+plt.show()
+#end
+
+
+<br><br><br><br>
+
+
+
+# low pass filtering  (box filter)
+# smoothing (Averaging)
+# gussian blur
+import numpy as np
+from matplotlib import pyplot as plt
+import cv2
+
+# plt.rcParams["figure.figsize"] = [7.50, 3.50]
+# plt.rcParams["figure.autolayout"] = True
+
+
+img = cv2.imread("grey.jpg", 0)
+
+# height,width,dim = img.shape
+print(img.shape)
+height, width = img.shape
+
+img_new =[[0 for i in range(img.shape[0])] for j in range(img.shape[1])]
+img_new =np.array(img_new)
+
+img3=[[0 for i in range(img.shape[0])] for j in range(img.shape[1])]
+img3=np.array(img3)
+
+img4=[[0 for i in range(img.shape[0])] for j in range(img.shape[1])]
+img4=np.array(img4)
+# img3 = np.ones((183,183,3))
+
+# img4 = np.ones((183,183,3))
+
+
+mask = np.ones((3, 3), np.float32) / 8  # box kernal
+# gussian blur->indexed element / sum of all element
+# mask_arr = np.array([[1,2,1],[2,4,2],[1,2,1]])
+# mask = mask_arr / np.sum(mask_arr)
+height = height - 1
+width = width - 1
+
+kernal_size = mask.shape[0]
+print(kernal_size)
+kernal_size_range = kernal_size // 2
+
+print(mask)
+for i in range(2,height - kernal_size_range):
+    for j in range(2, width - kernal_size_range):
+        print(img[i][j],end=" ")
+    print()
+for i in range(kernal_size_range, height - kernal_size_range):
+    for j in range(kernal_size_range, width - kernal_size_range):
+        addition = 0
+
+        lst = []
+        sum = 0
+        for k in range(-kernal_size_range, kernal_size_range + 1):
+
+            for l in range(-kernal_size_range, kernal_size_range + 1):
+                if k == 0 and l == 0:
+                    continue
+                else:
+                    lst.append(img[i + k][j + l] * mask[k][l])
+        img_new[i][j] = np.sum(lst)
+        print("sum:=",img_new[i][j])
+        img3[i][j]=img[i][j]-img_new[i][j]
+        img4[i][j] = img[i][j] + ((img3[i][j]))
+print("img:",img)
+print("img2:",img_new)
+print("img3:",img3)
+print(img4)
+cv2.imshow("img", img)
+cv2.waitKey(0)
+
+plt.imshow(img_new,cmap="gray")
+plt.show()
+
+plt.imshow(img3,cmap="gray")
+plt.show()
+
+plt.imshow(img4,cmap="gray")
+plt.show()
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#end
+
+
+
+<br><br><br><br>
+
+#convMAtrix
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2
+import math
+
+# Read the image in greyscale
+img = cv2.imread("grey.jpg",0)
+# plt.hist(img,256)
+# plt.show()
+mask=3
+maskarr=[[1/8,1/8,1/8],[1/8,1/8,1/8],[1/8,1/8,1/8]]
+
+cv2.imshow("No filter",img)
+# Iterate over each pixel and change pixel value to binary using np.binary_repr() and store it in a list.
+for i in range(3):
+    for j in range(3):
+        print(img[i][j], end=" ")
+val=[]
+
+print("-------------------------------")
+for i in range(img.shape[0]-mask):
+    for j in range(img.shape[1]-mask):
+        sum=0
+        for k in range(mask):
+            for l in range(mask):
+                if k==l==(math.floor(mask/2)):
+                    continue
+                else:
+                    sum=sum+(img[i+k][j+l]*maskarr[k][l])
+        #avg=sum/((mask*mask)-1)
+        print("sum: =",sum)
+        img[i+(math.floor(mask/2))][j+(math.floor(mask/2))]=sum
+        print(img[i][j], end=" ")
+
+    print()
+cv2.imshow("filter",img)
+cv2.waitKey(0)
+
